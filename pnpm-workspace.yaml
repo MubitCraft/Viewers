@@ -14,6 +14,23 @@ minimumReleaseAge: 2880
 # bunfig.toml `minimumReleaseAgeExcludes` list (pnpm supports glob patterns).
 minimumReleaseAgeExclude:
   - '@cornerstonejs/*'
+  - '@rspack/binding-darwin-arm64@2.2.7'
+  - '@rspack/binding-darwin-x64@2.2.7'
+  - '@rspack/binding-linux-arm64-gnu@2.2.7'
+  - '@rspack/binding-linux-arm64-musl@2.2.7'
+  - '@rspack/binding-linux-ppc64-gnu@2.2.7'
+  - '@rspack/binding-linux-riscv64-gnu@2.2.7'
+  - '@rspack/binding-linux-riscv64-musl@2.2.7'
+  - '@rspack/binding-linux-s390x-gnu@2.2.7'
+  - '@rspack/binding-linux-x64-gnu@2.2.7'
+  - '@rspack/binding-linux-x64-musl@2.2.7'
+  - '@rspack/binding-wasm32-wasi@2.2.7'
+  - '@rspack/binding-win32-arm64-msvc@2.2.7'
+  - '@rspack/binding-win32-ia32-msvc@2.2.7'
+  - '@rspack/binding-win32-x64-msvc@2.2.7'
+  - '@rspack/binding@2.2.7'
+  - '@rspack/cli@2.2.7'
+  - '@rspack/core@2.2.7'
 frozenLockfile: true
 
 # Skip the pre-`pnpm run` frozen deps-check; installs set freshness explicitly.

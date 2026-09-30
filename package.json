@@ -1,7 +1,6 @@
 {
   "name": "ohif-monorepo-root",
   "private": true,
-  "packageManager": "pnpm@11.5.2",
   "engines": {
     "node": ">=24",
     "pnpm": ">=11"
@@ -24,6 +23,7 @@
     "dev": "pnpm --filter @ohif/app run dev:viewer",
     "dev:no:cache": "pnpm --filter @ohif/app run dev:no:cache",
     "dev:project": ".scripts/dev.sh",
+    "dev:orthanc:local": "pnpm --filter @ohif/app run dev:orthanc:local",
     "dev:orthanc": "pnpm --filter @ohif/app run dev:orthanc",
     "dev:orthanc:no:cache": "pnpm --filter @ohif/app run dev:orthanc:no:cache",
     "dev:dcm4chee": "pnpm --filter @ohif/app run dev:dcm4chee",
@@ -91,6 +91,8 @@
     "@rsbuild/plugin-node-polyfill": "1.4.6",
     "@rsbuild/plugin-react": "2.1.0",
     "@rsdoctor/rspack-plugin": "1.6.0",
+    "@rspack/cli": "^2.2.7",
+    "@rspack/core": "^2.2.7",
     "@testing-library/dom": "10.4.1",
     "@testing-library/react": "16.3.2",
     "@typescript-eslint/parser": "8.64.0",

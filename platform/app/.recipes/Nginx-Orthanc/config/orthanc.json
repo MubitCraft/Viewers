@@ -10,6 +10,11 @@
   "ConcurrentJobs": 2,
   "HttpServerEnabled": true,
   "HttpPort": 8042,
+  "HttpHeaders": {
+    "Access-Control-Allow-Origin": "http://localhost:3000",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Accept, Content-Type, Origin, Authorization"
+  },
   "HttpDescribeErrors": true,
   "HttpCompressionEnabled": true,
   "DicomServerEnabled": true,
