@@ -26,6 +26,86 @@ directory. Our build process knows which configuration file to use based on the
 [`config/default.js`][default-config]. The majority of the viewer's features,
 and registered extension's features, are configured using this file.
 
+### Connecting to a local Orthanc instance directly
+
+The optional `config/orthanc-direct.js` profile connects directly to Orthanc on
+`localhost:8042`. It uses `/dicom-web/` for QIDO and WADO-RS requests and `/wado`
+for WADO-URI. The `imageRendering: 'wadors'` setting uses WADO-RS for image
+frames.
+
+Select this profile when building the deployment:
+
+```bash
+APP_CONFIG=config/orthanc-direct.js pnpm --filter @ohif/app run build:viewer
+```
+
+This profile is for local HTTP development where the browser can reach Orthanc
+at `localhost:8042`. The Orthanc sample configuration allows CORS from
+`http://localhost:3000`; if OHIF runs on another origin, allow only that exact
+origin in Orthanc or its proxy. Do not expose unauthenticated Orthanc or port
+8042 publicly. For HTTPS deployments, keep the same-origin reverse proxy and
+use its HTTPS DICOMweb path instead; a browser blocks HTTP Orthanc requests from
+an HTTPS OHIF page.
+
+### Zooming and tile retrieval for Whole Slide Imaging
+
+The Orthanc direct profile opts into OHIF's existing native Cornerstone
+GenericViewport path with `genericViewports.enabled: true`. For supported DICOM
+Whole Slide Microscopy images, Cornerstone's microscopy viewer uses the DICOM
+pyramid metadata and the active viewport map to retrieve only the tile frames
+needed for the visible region and resolution as the user zooms or pans. Tile
+requests use the configured DICOMweb WADO client; no separate map service or
+OHIF core changes are needed. This setting opts all viewports in this profile
+into the native GenericViewport path, not only WSI viewports.
+
+This requires genuine, supported tiled Whole Slide Microscopy DICOM with its
+pyramid and per-frame tile metadata intact, and a backend that implements
+DICOMweb RetrieveFrames for those instances. A regular single-image DICOM does
+not become a tiled slide just by zooming. The viewer's visible map extent is the
+effective tile-request region; this is not the same as drawing a measurement
+ROI. Verify zoom and pan in the browser Network panel and confirm requests use
+the expected WADO-RS `/studies/.../series/.../instances/.../frames/...` route.
+For a one-session trial without changing a profile, add
+`?useNextViewports=true` to the OHIF URL.
+
+### Uploading files with the chunked upload API
+
+The local Orthanc profile also enables the existing upload button and points it
+to `http://localhost:8080/api/instances/chunked-upload`. OHIF validates the
+DICOM preamble, slices files from the browser `File` in sequential 5 MiB
+chunks, and sends each chunk with its byte offset and lowercase hexadecimal
+SHA-256 checksum. The last chunk is kept at least 1 MiB. The API URL is
+independent of the QIDO/WADO DICOMweb roots. Other DICOMweb configurations
+without `chunkedUploadRoot` continue to use OHIF's existing STOW upload path.
+
+For Visual Studio local development, run OHIF at the API's allowed origin
+(`http://localhost:3000`). The API must allow that exact origin and permit
+`POST`, `PUT`, `GET`, `DELETE`, and the `Content-Type`, `Upload-Offset`, and
+`Upload-Chunk-Sha256` headers in its CORS preflight response.
+
+For IIS, change `chunkedUploadRoot` to
+`https://<lab-host>:5001/api/instances/chunked-upload`. Windows Authentication
+is used with same-origin browser credentials. Because the current IIS CORS
+configuration does not allow credentialed cross-origin requests, serve the API
+through the same origin as OHIF (for example, via a reverse proxy), or update
+the server's CORS policy to allow credentials and the exact OHIF origin before
+using a cross-origin URL. Do not use `credentials: 'include'` until the server
+is configured for credentialed CORS.
+
+To enable supported TIFF WSI conversion, set `convertToDicomWsi: true` in this
+data source. OHIF sends `convertToDicomWsi: true` in the start request only for
+`.tif`/`.tiff` files; the backend must have its converter configured.
+
+The API must return `201` with `uploadId` and `nextOffset` when a session starts,
+accept each sequential chunk, and return `202` from the completion request.
+The status endpoint must return JSON containing `status` or `state`; OHIF waits
+for `completed`, `success`, `succeeded`, or `imported`, and displays server
+errors for `failed`, `error`, or `rejected`. The browser gives up after 30
+minutes if the status remains pending. Regular DICOM files over 128 MiB are
+rejected by the backend at completion with `413`; OHIF displays that error and
+does not bypass the server limit. Successful regular DICOM imports use C-STORE;
+TIFF conversion requires the configured converter.
+
 The simplest way is to update the existing default config:
 
 ```js title="platform/app/public/config/default.js"
