@@ -900,7 +900,7 @@ export const segmentationModeToolbarSections: Record<string, string[]> = {
   [TOOLBAR_SECTIONS.primary]: [
     'WindowLevel',
     'Pan',
-    'Zoom',
+    'ZoomTools',
     'TrackballRotate',
     'Capture',
     'Layout',
@@ -928,6 +928,8 @@ export const segmentationModeToolbarSections: Record<string, string[]> = {
 
   [TOOLBAR_SECTIONS.viewportActionMenu.bottomLeft]: ['windowLevelMenu'],
 
+  ZoomTools: ['Zoom', 'Magnify', 'AdvancedMagnify'],
+
   MoreTools: [
     'Reset',
     'rotate-right',
@@ -937,7 +939,6 @@ export const segmentationModeToolbarSections: Record<string, string[]> = {
     'StackScroll',
     'invert',
     'Cine',
-    'Magnify',
     'TagBrowser',
   ],
 };
