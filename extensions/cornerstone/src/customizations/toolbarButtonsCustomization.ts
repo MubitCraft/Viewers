@@ -33,6 +33,13 @@ const toolbarButtons: Button[] = [
     },
   },
   {
+    id: 'ZoomTools',
+    uiType: 'ohif.toolButtonList',
+    props: {
+      buttonSection: true,
+    },
+  },
+  {
     id: 'MoreTools',
     uiType: 'ohif.toolButtonList',
     props: {
@@ -719,7 +726,7 @@ const toolbarButtons: Button[] = [
 export const toolbarSections = {
   [TOOLBAR_SECTIONS.primary]: [
     'MeasurementTools',
-    'Zoom',
+    'ZoomTools',
     'Pan',
     'TrackballRotate',
     'WindowLevel',
@@ -749,6 +756,8 @@ export const toolbarSections = {
 
   [TOOLBAR_SECTIONS.viewportActionMenu.bottomLeft]: ['windowLevelMenu'],
 
+  ZoomTools: ['Zoom', 'Magnify', 'AdvancedMagnify'],
+
   MeasurementTools: [
     'Length',
     'Bidirectional',
@@ -774,10 +783,8 @@ export const toolbarSections = {
     'Cine',
     'Angle',
     'CobbAngle',
-    'Magnify',
     'CalibrationLine',
     'TagBrowser',
-    'AdvancedMagnify',
     'UltrasoundDirectionalTool',
     'WindowLevelRegion',
     'SegmentLabelTool',

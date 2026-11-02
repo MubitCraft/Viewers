@@ -26,6 +26,54 @@ directory. Our build process knows which configuration file to use based on the
 [`config/default.js`][default-config]. The majority of the viewer's features,
 and registered extension's features, are configured using this file.
 
+### Connecting to a local Orthanc instance directly
+
+The optional `config/orthanc-direct.js` profile connects directly to Orthanc on
+`localhost:8042`. It uses `/dicom-web/` for QIDO and WADO-RS requests and `/wado`
+for WADO-URI. The `imageRendering: 'wadors'` setting uses WADO-RS for image
+frames.
+
+Select this profile when building the deployment:
+
+```bash
+APP_CONFIG=config/orthanc-direct.js pnpm --filter @ohif/app run build:viewer
+```
+
+This profile is for local HTTP development where the browser can reach Orthanc
+at `localhost:8042`. The Orthanc sample configuration allows CORS from
+`http://localhost:3000`; if OHIF runs on another origin, allow only that exact
+origin in Orthanc or its proxy. Do not expose unauthenticated Orthanc or port
+8042 publicly. For HTTPS deployments, keep the same-origin reverse proxy and
+use its HTTPS DICOMweb path instead; a browser blocks HTTP Orthanc requests from
+an HTTPS OHIF page.
+
+### Deep Zoom viewing for massive DICOM datasets uploaded via Orthanc Explorer
+
+Datasets, studies, instances, and entire folder hierarchies are uploaded via
+Orthanc Explorer's native upload interface or the Orthanc REST API. OHIF does
+**not** add a second upload path — all uploads go through Orthanc's own UI.
+Once files are ingested, OHIF retrieves them through the Orthanc DICOMweb plugin.
+
+The profile enables `genericViewports.enabled: true` so that Cornerstone's
+native GenericViewport backend handles all viewports. For DICOM Whole Slide
+Microscopy (VL WSI, SOP 1.2.840.10008.5.1.4.1.1.77.1.6) the viewer uses the
+DICOM pyramid metadata to fetch only the tile frames needed for the currently
+visible region and zoom level as the user pans or scrolls. The `ZoomTools`
+toolbar group (Zoom, Magnify, and Advanced Magnify) lets users inspect detail
+at any level of precision without reloading the full series.
+
+`enableStudyLazyLoad: true` and `omitQuotationForMultipartRequest: true`
+reduce initial load time for large studies. `bulkDataURI.enabled: true`
+lets Cornerstone retrieve waveforms and large attributes directly via their
+bulk-data URL instead of embedding them in the metadata response. Together
+these settings allow massive multi-frame CT/MRI and WSI pyramidal studies to
+open quickly and remain responsive while zooming.
+
+For a one-session trial without switching profiles, append
+`?useNextViewports=true` to the OHIF URL. Verify tile requests in the browser
+Network panel; each zoom/pan should produce `WADO-RS /studies/.../instances/.../frames/...`
+requests for only the visible tiles.
+
 The simplest way is to update the existing default config:
 
 ```js title="platform/app/public/config/default.js"
